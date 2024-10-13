@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "run": "deno run --allow-env --allow-read --allow-net main.ts",
+    "dev": "deno run --watch main.ts --env",
+    "test": "deno test --allow-env --allow-read --allow-net",
+    "wasm-build": "wasm-pack build wasm --target deno"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
