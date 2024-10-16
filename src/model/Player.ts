@@ -1,16 +1,21 @@
-import Model from "./Model.ts"
-
-class Player extends Model {
+class Player {
     name: string
+    role: PlayerRole = "crewmate"
+    location: string = ""
 
     constructor(name: string) {
-        super()
         this.name = name
     }
 
-    index(): Response {
-        return new Response("Player: " + this.name)
+    setRole(role: PlayerRole) {
+        this.role = role
+    }
+
+    setLocation(location: string) {
+        this.location = location
     }
 }
+
+export type PlayerRole = "crewmate" | "impostor"
 
 export default Player
