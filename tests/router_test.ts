@@ -52,10 +52,3 @@ Deno.test("router post", async () => {
     const text = await response.text()
     assertEquals(text, "another_method")
 })
-
-Deno.test({
-    name: "abort controller",
-    fn: () => {
-        ac.abort()
-    },
-})

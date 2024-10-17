@@ -5,6 +5,7 @@ import Player from "./Player.ts"
 class Lobby extends Model {
     players: Player[] = []
     settings: LobbySettings
+    host: Player | null = null
 
     constructor(settings: LobbySettings) {
         super()
@@ -32,15 +33,21 @@ class Lobby extends Model {
     startGame(request: Request): Response {
         const params = new URL(request.url).searchParams
         const location = params.get("location")
+        const host = params.get("host")
 
         if (!location) {
             return new Response("where are we?", { status: 400 })
         }
+        if (!host) {
+            return new Response("who is the host?", { status: 400 })
+        }
+
+        this.host = new Player(host)
+        this.players = this.players.filter((player) => player.name !== host)
 
         if (this.players.length < 3) {
             return new Response("Not enough players", { status: 400 })
         }
-
         if (this.players.length <= this.settings.impostors) {
             return new Response("Too many impostors", { status: 400 })
         }
