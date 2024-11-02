@@ -1,39 +1,50 @@
 import Helpers from "../Helpers.ts"
-import Model from "./Model.ts"
 import Player from "./Player.ts"
 
-class Lobby extends Model {
+class Lobby {
     players: Player[] = []
     settings: LobbySettings
     host: Player | null = null
 
     constructor(settings: LobbySettings) {
-        super()
         this.settings = settings
     }
 
     index(): Response {
         return new Response(
-            this.players.map((player) =>
-                `${player.name} - ${player.role} - ${player.location}`
-            ).join(",\n"),
+            this.players.map((player) => `${player.name} - ${player.role} - ${player.location}`)
+                .join(",\n"),
         )
     }
 
-    join(request: Request): Response {
-        const params = new URL(request.url).searchParams
-        const name = params.get("name")
+    getPlayers(): Response {
+        return new Response(JSON.stringify({ players: this.players }))
+    }
+
+    async join(request: Request): Promise<Response> {
+        if (!request.body) {
+            return new Response("Invalid request body", { status: 400 })
+        }
+        const body: { name?: string } = await Helpers.ReadableStreamToJsonObject(request.body)
+        const name = body.name
+
         if (!name) {
             return new Response("Name is required", { status: 400 })
         }
+
         this.players.push(new Player(name))
-        return new Response("Player added")
+        return new Response("Player added", { status: 201 })
     }
 
-    startGame(request: Request): Response {
-        const params = new URL(request.url).searchParams
-        const location = params.get("location")
-        const host = params.get("host")
+    async startGame(request: Request): Promise<Response> {
+        if (!request.body) {
+            return new Response("Invalid request body", { status: 400 })
+        }
+        const body: { location?: string; host?: string } = await Helpers.ReadableStreamToJsonObject(
+            request.body,
+        )
+        const location = body.location
+        const host = body.host
 
         if (!location) {
             return new Response("where are we?", { status: 400 })

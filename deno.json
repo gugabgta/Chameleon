@@ -2,8 +2,9 @@
   "tasks": {
     "run": "deno run -A --watch main.ts",
     "test": "deno test --allow-env --allow-read --allow-net",
-    "build": "deno compile --env-file .env --allow-read --allow-net main.ts",
+    "build": "deno compile --env-file=.env --allow-read --allow-net main.ts",
     "fmt": "deno fmt --check && deno lint",
+    "front-build": "npm run build --prefix svelte",
     "wasm-build": "wasm-pack build wasm --target deno"
   },
   "lint": {
@@ -17,11 +18,16 @@
   "fmt": {
     "indentWidth": 4,
     "semiColons": false,
-    "lineWidth": 80,
+    "lineWidth": 100,
     "singleQuote": false,
     "useTabs": false,
     "include": [
       "**/*.ts"
+    ],
+    "exclude": [
+      "examples/*",
+      "svelte/*",
+      "wasm/*"
     ]
   },
   "imports": {

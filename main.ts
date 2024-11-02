@@ -1,6 +1,8 @@
-import Handler from "./src/controller/Handler.ts"
+import Router from "./src/controller/Router.ts"
 import HTTPMethod from "./src/types/HttpMethod.ts"
 import Lobby from "./src/model/Lobby.ts"
+import Html from "./src/Html.ts"
+import "jsr:@std/dotenv/load"
 
 if (!import.meta.main) {
     Deno.exit(1)
@@ -12,27 +14,40 @@ const server_config = {
     hostname: address,
 }
 
-const handler = new Handler()
+const router = new Router()
 const lobby = new Lobby({
     name: "My Lobby",
     impostors: 1,
 })
 
-handler.registerRoute(HTTPMethod.GET, "/", () => new Response("Hello World!"))
-handler.registerRoute(HTTPMethod.GET, "/lobby", lobby.index.bind(lobby))
-handler.registerRoute(HTTPMethod.POST, "/lobby/join", lobby.join.bind(lobby))
-handler.registerRoute(
-    HTTPMethod.POST,
-    "/lobby/startGame",
-    lobby.startGame.bind(lobby),
-)
-handler.registerRoute(
-    HTTPMethod.GET,
-    "/lobby/getLocation",
-    lobby.getLocation.bind(lobby),
-)
+router.registerRoute(HTTPMethod.GET, "/", () => {
+    return new Html("menu-component").htmlResponse()
+})
 
-const fn = handler.handle.bind(handler)
+router.registerRoute(HTTPMethod.GET, "/", () => {
+    return new Html("lobby-component").htmlResponse()
+})
+
+router.registerRoute(HTTPMethod.GET, "/appjs", () => {
+    return new Response(Deno.readFileSync("svelte/dist/components.js"), {
+        headers: {
+            "content-type": "application/javascript",
+        },
+    })
+})
+
+router.routeGroup("/api/lobby", HTTPMethod.GET, [
+    ["", lobby.index.bind(lobby)],
+])
+
+router.routeGroup("/api/lobby", HTTPMethod.POST, [
+    ["/join", lobby.join.bind(lobby)],
+    ["/getplayers", lobby.getPlayers.bind(lobby)],
+    ["/startGame", lobby.startGame.bind(lobby)],
+    ["/getLocation", lobby.getLocation.bind(lobby)],
+])
+
+const fn = router.handle.bind(router)
 
 Deno.serve(
     server_config,

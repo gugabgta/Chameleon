@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert"
-import Handler from "../src/controller/Handler.ts"
+import Router from "../src/controller/Router.ts"
 import MockModel from "./model/MockModel.ts"
 import HTTPMethod from "../src/types/HttpMethod.ts"
 
@@ -15,18 +15,24 @@ const server_config = {
     signal: ac.signal,
 }
 
-const handler = new Handler()
+const router = new Router()
 
-handler.registerRoute(HTTPMethod.GET, "/", () => {
+router.registerRoute(HTTPMethod.GET, "/", () => {
     return new Response("Hello, world!")
 })
 
-handler.registerRoute(HTTPMethod.GET, "/mockModel", MockModel.a_method)
-handler.registerRoute(HTTPMethod.POST, "/mockModel", MockModel.another_method)
+router.registerRoute(HTTPMethod.GET, "/mockModel", MockModel.a_method)
+router.registerRoute(HTTPMethod.POST, "/mockModel", MockModel.another_method)
+router.routeGroup("/test", HTTPMethod.GET, [
+    ["/get", () => new Response("working")],
+])
+router.routeGroup("/test", HTTPMethod.POST, [
+    ["/post", MockModel.yet_another_method],
+])
 
-const fn = handler.handle.bind(handler)
+const fn = router.handle.bind(router)
 
-const server = Deno.serve(
+const _server = Deno.serve(
     server_config,
     fn,
 )
@@ -51,4 +57,19 @@ Deno.test("router post", async () => {
     })
     const text = await response.text()
     assertEquals(text, "another_method")
+})
+
+Deno.test("router group get", async () => {
+    const response = await fetch("http://localhost:3003/test/get")
+    const text = await response.text()
+    assertEquals(text, "working")
+})
+
+Deno.test("router group post", async () => {
+    const response = await fetch("http://localhost:3003/test/post", {
+        method: "POST",
+        body: JSON.stringify({ test: "working" }),
+    })
+    const text = await response.text()
+    assertEquals(text, "working")
 })

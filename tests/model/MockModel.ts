@@ -1,10 +1,9 @@
-import Model from "../../src/model/Model.ts"
+import Helpers from "../../src/Helpers.ts"
 
-class MockModel extends Model {
+class MockModel {
     name: string
 
     constructor(name: string) {
-        super()
         this.name = name
     }
 
@@ -20,8 +19,14 @@ class MockModel extends Model {
         return new Response("another_method")
     }
 
-    static yet_another_method(_params: Request): Response {
-        return new Response("yet_another_method")
+    static async yet_another_method(_params: Request): Promise<Response> {
+        if (!_params.body) {
+            return new Response("Invalid request body", { status: 400 })
+        }
+        const body: { test?: string } = await Helpers.ReadableStreamToJsonObject(_params.body)
+        const value = body.test
+
+        return new Response(value)
     }
 }
 
