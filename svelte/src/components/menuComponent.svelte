@@ -6,7 +6,7 @@
 {/if}
 
 <script lang="ts">
-    let name = $state("")
+    let name = $state("Gustavo")
     let input = null
 
     function changeName(event: Event) {

@@ -18,7 +18,14 @@ class Lobby {
     }
 
     getPlayers(): Response {
-        return new Response(JSON.stringify({ players: this.players }))
+        if (this.players.length === 0) {
+            return new Response("No players", { status: 404 })
+        }
+        return new Response(JSON.stringify({ players: this.players }), {
+            headers: {
+                "content-type": "application/json",
+            },
+        })
     }
 
     async join(request: Request): Promise<Response> {

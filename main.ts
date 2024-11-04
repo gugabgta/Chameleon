@@ -24,7 +24,7 @@ router.registerRoute(HTTPMethod.GET, "/", () => {
     return new Html("menu-component").htmlResponse()
 })
 
-router.registerRoute(HTTPMethod.GET, "/", () => {
+router.registerRoute(HTTPMethod.GET, "/lobby", () => {
     return new Html("lobby-component").htmlResponse()
 })
 
@@ -38,13 +38,13 @@ router.registerRoute(HTTPMethod.GET, "/appjs", () => {
 
 router.routeGroup("/api/lobby", HTTPMethod.GET, [
     ["", lobby.index.bind(lobby)],
+    ["/getPlayers", lobby.getPlayers.bind(lobby)],
+    ["/getLocation", lobby.getLocation.bind(lobby)],
 ])
 
 router.routeGroup("/api/lobby", HTTPMethod.POST, [
     ["/join", lobby.join.bind(lobby)],
-    ["/getplayers", lobby.getPlayers.bind(lobby)],
     ["/startGame", lobby.startGame.bind(lobby)],
-    ["/getLocation", lobby.getLocation.bind(lobby)],
 ])
 
 const fn = router.handle.bind(router)
