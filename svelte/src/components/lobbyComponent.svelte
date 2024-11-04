@@ -22,10 +22,10 @@
         console.log(name, location)
         const response = await fetch('api/lobby/startGame', {
             method: 'POST',
-            body: JSON.stringify({ name: name, location: location }),
+            body: JSON.stringify({ host: name, location: location }),
         })
 
-        alert('Error creating game')
+        alert(await response.text())
     }
 
     async function getLocation() {
@@ -51,9 +51,11 @@
             <button class="default-button width-50" onclick={getLocation}> Comecou? </button>
         </div>
         <ol class="ol-players">
-            {#each players.players as player}
-                <li class="li-players">{player.name}</li>
-            {/each}
+            {#if players.players.length > 0}
+                {#each players.players as player}
+                    <li class="li-players">{player.name}</li>
+                {/each}
+            {/if}
         </ol>
         <div class="container-horizontal">
             <input type="text" class="default-input thin" onchange={updateLocation} value="praia"/>
