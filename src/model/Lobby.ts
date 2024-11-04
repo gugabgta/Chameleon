@@ -109,7 +109,7 @@ class Lobby {
         if (!player) {
             return new Response("Player not found", { status: 404 })
         }
-        return new Response(player.location)
+        return new Response(JSON.stringify({location: player.location}))
     }
 }
 
