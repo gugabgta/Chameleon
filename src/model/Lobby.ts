@@ -111,6 +111,12 @@ class Lobby {
         }
         return new Response(JSON.stringify({ location: player.location }))
     }
+
+    kill(_request: Request): Response {
+        this.players = []
+        this.host = null
+        return new Response("They are all dead now...")
+    }
 }
 
 export type LobbySettings = {

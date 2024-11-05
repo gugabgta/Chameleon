@@ -40,6 +40,7 @@ router.routeGroup("/api/lobby", HTTPMethod.GET, [
     ["", lobby.index.bind(lobby)],
     ["/getPlayers", lobby.getPlayers.bind(lobby)],
     ["/getLocation", lobby.getLocation.bind(lobby)],
+    ['/kill', lobby.kill.bind(lobby)],
 ])
 
 router.routeGroup("/api/lobby", HTTPMethod.POST, [
