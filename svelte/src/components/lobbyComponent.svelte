@@ -1,12 +1,17 @@
 <svelte:options customElement="lobby-component" />
 
 <script>
-    export const name = new URL(window.location.href).searchParams.get('name') ?? "Gustavo"
+    export const name = new URL(window.location.href).searchParams.get('name') ?? ""
+    export const id = new URL(window.location.href).searchParams.get('id') ?? "0"
+
     let players = $state({ players: [] })
     let location = $state("praia")
 
     function updateLocation(event) {
-        location = event.target.value
+        const target = event.target;
+        if (target) {
+            location = target.value;
+        }
     }
 
     async function atualizar() {
@@ -19,17 +24,16 @@
     }
 
     async function startGame() {
-        console.log(name, location)
         const response = await fetch('api/lobby/startGame', {
             method: 'POST',
-            body: JSON.stringify({ host: name, location: location }),
+            body: JSON.stringify({ host: id, location: location }),
         })
 
         alert(await response.text())
     }
 
     async function getLocation() {
-        const response = await fetch(`api/lobby/getLocation?name=${name}`, {
+        const response = await fetch(`api/lobby/getLocation?id=${id}`, {
             method: 'GET',
         })
         if (response.ok) {
@@ -37,6 +41,14 @@
             alert(data.location)
             return
         }
+        alert(await response.text())
+    }
+
+    async function debugCheats() {
+        const response = await fetch('api/lobby', {
+            method: 'GET',
+        })
+
         alert(await response.text())
     }
 </script>
@@ -60,6 +72,7 @@
         <div class="container-horizontal">
             <input type="text" class="default-input thin" onchange={updateLocation} value="praia"/>
             <button class="default-button thin" onclick={startGame}>Start</button>
+            <!-- <button onclick={debugCheats}>Cheat!</button> -->
         </div>
     </div>
 </div>

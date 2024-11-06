@@ -1,24 +1,29 @@
 import Router from "./src/controller/Router.ts"
 import HTTPMethod from "./src/types/HttpMethod.ts"
-import Lobby from "./src/model/Lobby.ts"
+import { type LobbySettings } from "./src/model/Lobby.ts"
 import Html from "./src/Html.ts"
 import "jsr:@std/dotenv/load"
+import LobbyController from "./src/controller/LobbyController.ts"
+import Uuid from "./src/Helpers/Uuid.ts"
 
 if (!import.meta.main) {
     Deno.exit(1)
 }
 
 const address = Deno.env.get("SERVER_ADDRESS")
+const port = Deno.env.get("SERVER_PORT")
 const server_config = {
-    port: 8000,
-    hostname: address,
+    port: port ? parseInt(port) : 8000,
+    hostname: address ? address : "localhost",
 }
 
 const router = new Router()
-const lobby = new Lobby({
+const settings: LobbySettings = {
     name: "My Lobby",
     impostors: 1,
-})
+    id: Uuid.generate(),
+}
+const lobbyController = new LobbyController(settings)
 
 router.registerRoute(HTTPMethod.GET, "/", () => {
     return new Html("menu-component").htmlResponse()
@@ -37,15 +42,15 @@ router.registerRoute(HTTPMethod.GET, "/appjs", () => {
 })
 
 router.routeGroup("/api/lobby", HTTPMethod.GET, [
-    ["", lobby.index.bind(lobby)],
-    ["/getPlayers", lobby.getPlayers.bind(lobby)],
-    ["/getLocation", lobby.getLocation.bind(lobby)],
-    ['/kill', lobby.kill.bind(lobby)],
+    ["", lobbyController.index.bind(lobbyController)],
+    ["/getPlayers", lobbyController.getPlayers.bind(lobbyController)],
+    ["/getLocation", lobbyController.getLocation.bind(lobbyController)],
+    ["/kill", lobbyController.kill.bind(lobbyController)],
 ])
 
 router.routeGroup("/api/lobby", HTTPMethod.POST, [
-    ["/join", lobby.join.bind(lobby)],
-    ["/startGame", lobby.startGame.bind(lobby)],
+    ["/join", lobbyController.join.bind(lobbyController)],
+    ["/startGame", lobbyController.startGame.bind(lobbyController)],
 ])
 
 const fn = router.handle.bind(router)

@@ -28,6 +28,7 @@ router.routeGroup("/test", HTTPMethod.GET, [
 ])
 router.routeGroup("/test", HTTPMethod.POST, [
     ["/post", MockModel.yet_another_method],
+    ["/postJson", () => new Response(JSON.stringify({ key: "value" }))],
 ])
 
 const fn = router.handle.bind(router)
@@ -57,6 +58,14 @@ Deno.test("router post", async () => {
     })
     const text = await response.text()
     assertEquals(text, "another_method")
+})
+
+Deno.test("router post Json", async () => {
+    const response = await fetch("http://localhost:3003/test/postJson", {
+        method: "POST",
+    })
+    const json = await response.json()
+    assertEquals(json, { key: "value" })
 })
 
 Deno.test("router group get", async () => {

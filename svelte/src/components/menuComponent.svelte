@@ -7,7 +7,7 @@
 
 <script lang="ts">
     let name = $state("Gustavo")
-    let input = null
+    let input: HTMLInputElement | null = null
 
     function changeName(event: Event) {
         const target = event.target as HTMLInputElement;
@@ -17,10 +17,9 @@
     }
 
     async function click() {
-        console.log(name.length)
-        if (name.length < 2) {
+        if (name.length < 2 && input) {
             input.classList.toggle('shake')
-            setTimeout(() => input.classList.toggle('shake'), 390)
+            setTimeout(() => input?.classList.toggle('shake'), 390)
             return
         }
 
@@ -33,7 +32,8 @@
         })
 
         if (response.ok) {
-            window.location.href = '/lobby?name=' + name
+            const player = await response.json()
+            window.location.href = `/lobby?id=${player.id}&name=${player.name}`
             return
         }
         alert('Error joining server')

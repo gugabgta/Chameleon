@@ -1,4 +1,4 @@
-import Helpers from "../Helpers.ts"
+import Helpers from "../Helpers/Helpers.ts"
 import Player from "./Player.ts"
 
 class Lobby {
@@ -10,118 +10,77 @@ class Lobby {
         this.settings = settings
     }
 
-    index(): Response {
-        return new Response(
-            this.players.map((player) => `${player.name} - ${player.role} - ${player.location}`)
-                .join(",\n"),
-        )
+    index(): string {
+        return this.players.map(
+            (player) => `${player.name} - ${player.role} - ${player.location}`,
+        ).join(",\n")
     }
 
-    getPlayers(): Response {
-        if (this.players.length === 0) {
-            return new Response("No players", { status: 404 })
-        }
-        return new Response(JSON.stringify({ players: this.players }), {
-            headers: {
-                "content-type": "application/json",
-            },
-        })
+    findPlayer(id: string): Player | undefined {
+        return this.players.find((player) => player.id === id)
     }
 
-    async join(request: Request): Promise<Response> {
-        if (!request.body) {
-            return new Response("Invalid request body", { status: 400 })
-        }
-        const body: { name?: string } = await Helpers.ReadableStreamToJsonObject(request.body)
-        const name = body.name
-
-        if (!name) {
-            return new Response("Name is required", { status: 400 })
-        }
-
-        this.players.push(new Player(name))
-        return new Response("Player added", { status: 201 })
+    getPlayers(): Array<Player> {
+        return this.players
     }
 
-    async startGame(request: Request): Promise<Response> {
-        if (!request.body) {
-            return new Response("Invalid request body", { status: 400 })
-        }
-        const body: { location?: string; host?: string } = await Helpers.ReadableStreamToJsonObject(
-            request.body,
-        )
-        const location = body.location
-        const host = body.host
+    join(player: Player): boolean {
+        return this.players.push(player) > 0
+    }
 
-        if (!location) {
-            return new Response("where are we?", { status: 400 })
-        }
-        if (!host) {
-            return new Response("who is the host?", { status: 400 })
-        }
-
-        this.host = new Player(host)
-        this.players = this.players.filter((player) => player.name !== host)
-
-        if (this.players.length < 3) {
-            return new Response("Not enough players", { status: 400 })
+    startGame(host: Player, location: string): [boolean, string] {
+        if (this.players.length < 4) {
+            return [false, "Not enough players"]
         }
         if (this.players.length <= this.settings.impostors) {
-            return new Response("Too many impostors", { status: 400 })
+            return [false, "Too many impostors"]
         }
 
-        this.players.forEach((player) => player.setRole("crewmate"))
+        this.resetRoles()
+        this.host = host
         this.players = Helpers.shuffleArray(this.players)
+
+        this.players.forEach((player) => {
+            if (player == host) {
+                player.setRole("host")
+                return
+            }
+            player.setRole("crewmate")
+        })
         this.players.slice(0, this.settings.impostors).forEach((player) => {
+            if (player == host) {
+                return
+            }
             player.setRole("impostor")
             player.setLocation("impostor")
         })
-
         this.players.forEach((player) => {
-            if (player.role === "crewmate") {
+            if (player.role !== "impostor") {
                 player.setLocation(location)
             }
         })
 
-        return new Response("players roles set")
+        return [true, "players roles set"]
     }
 
-    returnRole(request: Request): Response {
-        const params = new URL(request.url).searchParams
-        const name = params.get("name")
-        if (!name) {
-            return new Response("Name is required", { status: 400 })
-        }
-        const player = this.players.find((player) => player.name === name)
-        if (!player) {
-            return new Response("Player not found", { status: 404 })
-        }
-        return new Response(player.role)
-    }
-
-    getLocation(request: Request): Response {
-        const params = new URL(request.url).searchParams
-        const name = params.get("name")
-        if (!name) {
-            return new Response("Name is required", { status: 400 })
-        }
-        const player = this.players.find((player) => player.name === name)
-        if (!player) {
-            return new Response("Player not found", { status: 404 })
-        }
-        return new Response(JSON.stringify({ location: player.location }))
-    }
-
-    kill(_request: Request): Response {
+    kill(): boolean {
         this.players = []
         this.host = null
-        return new Response("They are all dead now...")
+        return true
+    }
+
+    resetRoles(): void {
+        this.players.forEach((player) => {
+            player.setRole("crewmate")
+            player.setLocation("")
+        })
     }
 }
 
 export type LobbySettings = {
     name: string
     impostors: number
+    id: string
 }
 
 export default Lobby

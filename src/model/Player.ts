@@ -1,10 +1,14 @@
+import Uuid from "../Helpers/Uuid.ts"
+
 class Player {
     name: string
     role: PlayerRole = "crewmate"
     location: string = ""
+    id: string = ""
 
     constructor(name: string) {
         this.name = name
+        this.id = Uuid.generate()
     }
 
     setRole(role: PlayerRole) {
@@ -16,6 +20,6 @@ class Player {
     }
 }
 
-export type PlayerRole = "crewmate" | "impostor"
+export type PlayerRole = "crewmate" | "impostor" | "host"
 
 export default Player
