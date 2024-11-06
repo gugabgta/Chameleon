@@ -39,25 +39,23 @@ class Lobby {
         this.resetRoles()
         this.host = host
         this.players = Helpers.shuffleArray(this.players)
+        let total_impostors = 0
 
         this.players.forEach((player) => {
             if (player == host) {
                 player.setRole("host")
-                return
-            }
-            player.setRole("crewmate")
-        })
-        this.players.slice(0, this.settings.impostors).forEach((player) => {
-            if (player == host) {
-                return
-            }
-            player.setRole("impostor")
-            player.setLocation("impostor")
-        })
-        this.players.forEach((player) => {
-            if (player.role !== "impostor") {
                 player.setLocation(location)
+                return
             }
+
+            if (total_impostors < this.settings.impostors) {
+                player.setRole("impostor")
+                total_impostors++
+                return
+            }
+
+            player.setRole("crewmate")
+            player.setLocation(location)
         })
 
         return [true, "players roles set"]
