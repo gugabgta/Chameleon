@@ -2,7 +2,7 @@ import Helpers from "../Helpers/Helpers.ts"
 import Player from "./Player.ts"
 
 class Lobby {
-    players: Player[] = []
+    players: Map<string, Player> = new Map()
     settings: LobbySettings
     host: Player | null = null
 
@@ -11,34 +11,38 @@ class Lobby {
     }
 
     index(): string {
-        return this.players.map(
-            (player) => `${player.name} - ${player.role} - ${player.location}`,
-        ).join(",\n")
+        let players_string = ""
+        this.players.forEach((player) => {
+            players_string += `${player.name} - ${player.role} - ${player.location}\n`
+        })
+
+        return players_string
     }
 
     findPlayer(id: string): Player | undefined {
-        return this.players.find((player) => player.id === id)
+        return this.players.get(id)
     }
 
     getPlayers(): Array<Player> {
-        return this.players
+        return Array.from(this.players.values())
     }
 
     join(player: Player): boolean {
-        return this.players.push(player) > 0
+        this.players.set(player.id, player)
+        return this.players.has(player.id)
     }
 
     startGame(host: Player, location: string): [boolean, string] {
-        if (this.players.length < 4) {
+        if (this.players.size < 4) {
             return [false, "Not enough players"]
         }
-        if (this.players.length <= this.settings.impostors) {
+        if (this.players.size <= this.settings.impostors) {
             return [false, "Too many impostors"]
         }
 
         this.resetRoles()
         this.host = host
-        this.players = Helpers.shuffleArray(this.players)
+        this.players = Helpers.shuffleMap(this.players)
         let total_impostors = 0
 
         this.players.forEach((player) => {
@@ -62,7 +66,7 @@ class Lobby {
     }
 
     kill(): boolean {
-        this.players = []
+        this.players.clear()
         this.host = null
         return true
     }
