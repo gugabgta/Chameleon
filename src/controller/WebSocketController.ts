@@ -2,40 +2,42 @@ import type Lobby from "../model/Lobby.ts"
 
 class WebSocketController {
     lobby: Lobby
-    connections: WebSocket[]
 
     constructor(lobby: Lobby) {
         this.lobby = lobby
-        this.connections = []
     }
 
-    handleWebSocket(request: Request): Response {
+    handleWebSocket(request: Request): Deno.WebSocketUpgrade {
         if (request.headers.get("upgrade") != "websocket") {
-            return new Response("no upgrade header", { status: 501 })
+            throw new Error("no upgrade header")
         }
-        const { socket, response } = Deno.upgradeWebSocket(request)
-        this.connections.push(socket)
-        return response
+
+        if (request.headers.get("connection") != "Upgrade") {
+            throw new Error("no connection header")
+        }
+
+        if (request.headers.get("sec-websocket-key") == "") {
+            throw new Error("no websocket key")
+        }
+        return Deno.upgradeWebSocket(request)
     }
 
-    broadcast(request: Request): Response {
-        const params = new URL(request.url).searchParams
+    static addListeners(connection: WebSocket): void {
+        connection.addEventListener("message", (event) => {
+            console.log(event)
+        })
 
-        if (!params) {
-            return new Response("Invalid request body", { status: 400 })
-        }
+        connection.addEventListener("close", () => {
+            console.log("WebSocket connection closed")
+        })
 
-        const message = params.get("message")
+        connection.addEventListener("error", (error) => {
+            console.error(`WebSocket error:`, error)
+        })
 
-        if (!message) {
-            return new Response("Message is required", { status: 400 })
-        }
-
-        this.connections.forEach((conn) => {
-            conn.send(message);
-        });
-
-        return new Response(message, { status: 200 })
+        connection.addEventListener("open", () => {
+            console.log("WebSocket connection open")
+        })
     }
 }
 

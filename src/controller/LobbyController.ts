@@ -1,9 +1,11 @@
 import Helpers from "../Helpers/Helpers.ts"
 import Lobby from "../model/Lobby.ts"
 import Player from "../model/Player.ts"
+import WebSocketController from "./WebSocketController.ts"
 
 class LobbyController {
     lobby: Lobby
+    socket_connections: Map<string, WebSocket> = new Map()
 
     constructor(lobby: Lobby) {
         this.lobby = lobby
@@ -51,6 +53,62 @@ class LobbyController {
             }),
             { status: 201 },
         )
+    }
+
+    assignWebSocket(request: Request): Response {
+        const params = new URL(request.url).searchParams
+        const id = params.get("id")
+        if (!id) {
+            return new Response("Player Id is required", { status: 400 })
+        }
+
+        const socket_handler = new WebSocketController(this.lobby)
+        try {
+            const { socket, response } = socket_handler.handleWebSocket(request)
+            if (response.status !== 101) {
+                return response
+            }
+
+            socket.addEventListener("message", (event) => {
+                console.log(event)
+            })
+
+            socket.addEventListener("close", () => {
+                console.log("WebSocket connection closed")
+            })
+
+            socket.addEventListener("error", (error) => {
+                console.error(`WebSocket error:`, error)
+            })
+
+            socket.addEventListener("open", () => {
+                console.log("WebSocket connection open")
+            })
+
+            this.socket_connections.set(id, socket)
+            return response
+        } catch (error: unknown) {
+            const errorMessage = (error as Error).message;
+            return new Response(errorMessage, { status: 400 })
+        }
+    }
+
+    async broadcast(request: Request): Promise<Response> {
+        if (!request.body) {
+            return new Response("Invalid request body", { status: 400 })
+        }
+        const body: { message?: string } = await Helpers.ReadableStreamToJsonObject(request.body)
+        const message = body.message
+
+        if (!message) {
+            return new Response("Message is required", { status: 400 })
+        }
+
+        this.socket_connections.forEach((socket) => {
+            socket.send(message)
+        })
+
+        return new Response("Message sent", { status: 200 })
     }
 
     async startGame(request: Request): Promise<Response> {

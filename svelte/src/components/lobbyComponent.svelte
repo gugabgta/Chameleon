@@ -7,6 +7,16 @@
     let players = $state({ players: [] })
     let location = $state("praia")
 
+    async function onLoad() {
+        const web_socket = new WebSocket(
+            `ws://${window.location.host}/api/lobby/webSocket?id=${id}`
+        )
+
+        web_socket.onmessage = (event) => {
+            console.log(event)
+        }
+    }
+
     function updateLocation(event) {
         const target = event.target;
         if (target) {
@@ -51,6 +61,8 @@
 
         alert(await response.text())
     }
+
+    onLoad()
 </script>
 
 <div class="component-wrapper">

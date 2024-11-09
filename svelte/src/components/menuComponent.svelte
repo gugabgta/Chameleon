@@ -31,12 +31,13 @@
             body: JSON.stringify({ name: name })
         })
 
-        if (response.ok) {
-            const player = await response.json()
-            window.location.href = `/lobby?id=${player.id}&name=${player.name}`
+        if (!response.ok) {
+            alert('Error joining server')
             return
         }
-        alert('Error joining server')
+        const player = await response.json()
+        window.location.href = `/lobby?id=${player.id}&name=${player.name}`
+        return
     }
 </script>
 
