@@ -1,9 +1,10 @@
 import Router from "./src/controller/Router.ts"
 import HTTPMethod from "./src/types/HttpMethod.ts"
-import { type LobbySettings } from "./src/model/Lobby.ts"
+import Lobby, { type LobbySettings } from "./src/model/Lobby.ts"
 import Html from "./src/Html.ts"
 import "jsr:@std/dotenv/load"
 import LobbyController from "./src/controller/LobbyController.ts"
+import WebSocketController from "./src/controller/WebSocketController.ts"
 import Uuid from "./src/Helpers/Uuid.ts"
 
 if (!import.meta.main) {
@@ -23,7 +24,10 @@ const settings: LobbySettings = {
     impostors: 1,
     id: Uuid.generate(),
 }
-const lobbyController = new LobbyController(settings)
+
+const lobby = new Lobby(settings)
+const lobbyController = new LobbyController(lobby)
+const webSocketController = new WebSocketController(lobby)
 
 router.registerRoute(HTTPMethod.GET, "/", () => {
     return new Html("menu-component").htmlResponse()
@@ -39,6 +43,14 @@ router.registerRoute(HTTPMethod.GET, "/appjs", () => {
             "content-type": "application/javascript",
         },
     })
+})
+
+router.registerRoute(HTTPMethod.GET, "/websocket", (request: Request) => {
+    return webSocketController.handleWebSocket.bind(webSocketController)(request)
+})
+
+router.registerRoute(HTTPMethod.GET, "/websocket/broadcast", (request: Request) => {
+    return webSocketController.broadcast.bind(webSocketController)(request)
 })
 
 router.routeGroup("/api/lobby", HTTPMethod.GET, [

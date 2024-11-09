@@ -1,12 +1,12 @@
 import Helpers from "../Helpers/Helpers.ts"
-import Lobby, { type LobbySettings } from "../model/Lobby.ts"
+import Lobby from "../model/Lobby.ts"
 import Player from "../model/Player.ts"
 
 class LobbyController {
     lobby: Lobby
 
-    constructor(settings: LobbySettings) {
-        this.lobby = new Lobby(settings)
+    constructor(lobby: Lobby) {
+        this.lobby = lobby
     }
 
     index(): Response {
