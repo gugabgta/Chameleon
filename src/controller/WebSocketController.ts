@@ -1,4 +1,5 @@
 import Helpers from "../Helpers/Helpers.ts"
+import BroadcastMessage from "../model/BroadcastMessage.ts"
 import type Lobby from "../model/Lobby.ts"
 import WebSocketModel from "../model/WebSocket.ts"
 
@@ -32,7 +33,7 @@ class WebSocketController {
         try {
             return this.web_socket.handleWebSocket(request, id)
         } catch (error: unknown) {
-            const errorMessage = (error as Error).message;
+            const errorMessage = (error as Error).message
             return new Response(errorMessage, { status: 400 })
         }
     }
@@ -41,19 +42,24 @@ class WebSocketController {
         if (!request.body) {
             return new Response("Invalid request body", { status: 400 })
         }
-        const body: { message?: string } = await Helpers.ReadableStreamToJsonObject(
-            request.body
-        )
+        const body: { message?: string; channel?: string } = await Helpers
+            .ReadableStreamToJsonObject(request.body)
+
         const message = body.message
+        const channel = body.channel
 
         if (!message) {
             return new Response("Message is required", { status: 400 })
         }
 
-        this.web_socket.broadcast(message)
+        if (!channel) {
+            return new Response("Channel is required", { status: 400 })
+        }
+
+        this.web_socket.broadcast(new BroadcastMessage(message, channel))
 
         return new Response("Message sent", { status: 200 })
     }
 }
 
-export default WebSocketController;
+export default WebSocketController

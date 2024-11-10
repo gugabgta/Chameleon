@@ -15,8 +15,19 @@
         )
 
         web_socket.onmessage = (event) => {
-            console.log(event)
+            const [channel, message] = channelMessage(event)
+            if (channel === 'canal1') {
+                console.log(message)
+                return
+            }
+
+            console.log('Unknown channel')
         }
+    }
+
+    function channelMessage(event) {
+        const message = event.data.split(':')
+        return [message[0], message[1]]
     }
 
     function updateLocation(event) {
