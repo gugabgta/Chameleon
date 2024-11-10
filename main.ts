@@ -6,6 +6,7 @@ import "jsr:@std/dotenv/load"
 import LobbyController from "./src/controller/LobbyController.ts"
 import Uuid from "./src/Helpers/Uuid.ts"
 import WebSocketController from "./src/controller/WebSocketController.ts"
+import WebSocketModel from "./src/model/WebSocket.ts"
 
 if (!import.meta.main) {
     Deno.exit(1)
@@ -26,8 +27,9 @@ const settings: LobbySettings = {
 }
 
 const lobby = new Lobby(settings)
-const lobbyController = new LobbyController(lobby)
-const webSocketController = new WebSocketController(lobby)
+const ws = new WebSocketModel()
+const lobbyController = new LobbyController(lobby, ws)
+const webSocketController = new WebSocketController(lobby, ws)
 
 router.registerRoute(HTTPMethod.GET, "/", () => {
     return new Html("menu-component").htmlResponse()

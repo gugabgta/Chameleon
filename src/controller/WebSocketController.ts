@@ -7,9 +7,9 @@ class WebSocketController {
     lobby: Lobby
     web_socket: WebSocketModel
 
-    constructor(lobby: Lobby) {
+    constructor(lobby: Lobby, ws: WebSocketModel) {
         this.lobby = lobby
-        this.web_socket = new WebSocketModel()
+        this.web_socket = ws
     }
 
     assignWebSocket(request: Request): Response {

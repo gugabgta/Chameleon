@@ -14,15 +14,15 @@
             `ws://${window.location.host}/api/lobby/webSocket?id=${id}`
         )
 
-        web_socket.onmessage = (event) => {
+        web_socket.onmessage = async (event) => {
             const [channel, message] = channelMessage(event)
-            if (channel === 'canal1') {
-                console.log(message)
-                return
+            if (channel === 'new_player') {
+                atualizar()
             }
 
             console.log('Unknown channel')
         }
+        atualizar()
     }
 
     function channelMessage(event) {

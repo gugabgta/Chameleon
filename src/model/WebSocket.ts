@@ -21,12 +21,17 @@ class WebSocketModel {
         })
     }
 
-    broadcastTo(socket_id: PlayerId, message: BroadcastMessage): boolean {
-        const socket = this.socket_connections.get(socket_id)
-        if (!socket) {
-            return false
+    broadcastTo(socket_id: PlayerId | PlayerId[], message: BroadcastMessage): boolean {
+        if (!Array.isArray(socket_id)) {
+            socket_id = [socket_id]
         }
-        socket.send(message.getMessage())
+        socket_id.forEach((id) => {
+            const socket = this.socket_connections.get(id)
+            if (!socket) {
+                return false
+            }
+            socket.send(message.getMessage())
+        })
         return true
     }
 

@@ -1,12 +1,16 @@
 import Helpers from "../Helpers/Helpers.ts"
+import BroadcastMessage from "../model/BroadcastMessage.ts"
 import Lobby from "../model/Lobby.ts"
 import Player from "../model/Player.ts"
+import WebSocketModel from "../model/WebSocket.ts"
 
 class LobbyController {
     lobby: Lobby
+    ws: WebSocketModel
 
-    constructor(lobby: Lobby) {
+    constructor(lobby: Lobby, ws: WebSocketModel) {
         this.lobby = lobby
+        this.ws = ws
     }
 
     index(): Response {
@@ -43,6 +47,8 @@ class LobbyController {
         if (!this.lobby.join(player)) {
             return new Response("Player not added", { status: 500 })
         }
+
+        this.ws.broadcast(new BroadcastMessage(`${player.name} has joined the lobby`, "new_player"))
 
         return new Response(
             JSON.stringify({
