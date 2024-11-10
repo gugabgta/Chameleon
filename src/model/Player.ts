@@ -1,10 +1,12 @@
 import Uuid from "../Helpers/Uuid.ts"
 
+export type PlayerId = string
+
 class Player {
     name: string
     role: PlayerRole = "crewmate"
     location: string = ""
-    id: string = ""
+    id: PlayerId = ""
 
     constructor(name: string) {
         this.name = name

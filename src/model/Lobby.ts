@@ -1,8 +1,8 @@
 import Helpers from "../Helpers/Helpers.ts"
-import Player from "./Player.ts"
+import Player, { type PlayerId } from "./Player.ts"
 
 class Lobby {
-    players: Map<string, Player> = new Map()
+    players: Map<PlayerId, Player> = new Map()
     settings: LobbySettings
     host: Player | null = null
 

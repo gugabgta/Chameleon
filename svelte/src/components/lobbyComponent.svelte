@@ -1,6 +1,8 @@
 <svelte:options customElement="lobby-component" />
 
 <script>
+// @ts-nocheck
+
     export const name = new URL(window.location.href).searchParams.get('name') ?? ""
     export const id = new URL(window.location.href).searchParams.get('id') ?? "0"
 
