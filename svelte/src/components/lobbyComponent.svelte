@@ -10,9 +10,16 @@
     let location = $state("praia")
 
     async function onLoad() {
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
         const web_socket = new WebSocket(
-            `ws://${window.location.host}/api/lobby/webSocket?id=${id}`
+            `${protocol}://${window.location.host}/api/lobby/webSocket?id=${id}`
         )
+
+        if (!web_socket) {
+            console.log(`tried connection to ws://${window.location.host}/api/lobby/webSocket?id=${id}`)
+            alert('Error connecting to server')
+            return
+        }
 
         web_socket.onmessage = async (event) => {
             const [channel, message] = channelMessage(event)
