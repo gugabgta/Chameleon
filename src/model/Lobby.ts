@@ -54,6 +54,7 @@ class Lobby {
 
             if (total_impostors < this.settings.impostors) {
                 player.setRole("impostor")
+                player.setLocation("??????")
                 total_impostors++
                 return
             }
@@ -63,6 +64,14 @@ class Lobby {
         })
 
         return [true, "players roles set"]
+    }
+
+    leave(player: Player): boolean {
+        if (this.host == player) {
+            this.host = null
+        }
+        this.players.delete(player.id)
+        return !this.players.has(player.id)
     }
 
     kill(): boolean {

@@ -53,11 +53,13 @@ router.routeGroup("/api/lobby", HTTPMethod.GET, [
     ["/getPlayers", lobbyController.getPlayers.bind(lobbyController)],
     ["/getLocation", lobbyController.getLocation.bind(lobbyController)],
     ["/kill", lobbyController.kill.bind(lobbyController)],
+    ["/leave", lobbyController.leave.bind(lobbyController)],
 ])
 
 router.routeGroup("/api/lobby", HTTPMethod.POST, [
     ["/join", lobbyController.join.bind(lobbyController)],
     ["/startGame", lobbyController.startGame.bind(lobbyController)],
+    ["/endGame", lobbyController.endGame.bind(lobbyController)],
     ["/broadcast", webSocketController.broadcast.bind(webSocketController)],
 ])
 

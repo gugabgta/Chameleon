@@ -8,10 +8,14 @@
 
     let players = $state({ players: [] })
     let location = $state("praia")
+    let current_location = $state("")
+    let game_started = $state(false)
+    let web_socket = null
+    let is_host = false
 
     async function onLoad() {
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-        const web_socket = new WebSocket(
+        web_socket = new WebSocket(
             `${protocol}://${window.location.host}/api/lobby/webSocket?id=${id}`
         )
 
@@ -24,12 +28,35 @@
         web_socket.onmessage = async (event) => {
             const [channel, message] = channelMessage(event)
             if (channel === 'new_player') {
-                atualizar()
+                updatePlayers()
+                return
             }
 
-            console.log('Unknown channel')
+            if (channel === 'player_left') {
+                updatePlayers()
+                return
+            }
+
+            if (channel === 'game_started') {
+                if (message === 'true') {
+                    getLocation()
+                    game_started = true
+                }
+                return
+            }
+
+            if (channel === 'game_ended') {
+                game_started = false
+                return
+            }
+
+            console.log(`Unknown channel ${channel}`)
         }
-        atualizar()
+
+        web_socket.onclose = () => {
+            console.log('Connection closed')
+        }
+        updatePlayers()
     }
 
     function channelMessage(event) {
@@ -44,7 +71,7 @@
         }
     }
 
-    async function atualizar() {
+    async function updatePlayers() {
         let response = await fetch('api/lobby/getPlayers', { method: 'GET' })
         if (!response.ok) {
             alert('Error getting players')
@@ -59,19 +86,37 @@
             body: JSON.stringify({ host: id, location: location }),
         })
 
-        alert(await response.text())
+        if (response.ok) {
+            is_host = true
+            return
+        }
+    }
+
+    async function endGame() {
+        const response = await fetch('api/lobby/endGame', {
+            method: 'POST',
+            body: JSON.stringify({ host: id }),
+        })
+
+        if (response.ok) {
+            is_host = false
+            game_started = false
+            return
+        }
     }
 
     async function getLocation() {
         const response = await fetch(`api/lobby/getLocation?id=${id}`, {
             method: 'GET',
         })
+
         if (response.ok) {
             const data = await response.json()
-            alert(data.location)
+            current_location = data.location
             return
         }
-        alert(await response.text())
+
+        alert('Error getting location')
     }
 
     async function debugCheats() {
@@ -80,6 +125,15 @@
         })
 
         alert(await response.text())
+    }
+
+    async function leave() {
+        web_socket.close()
+        const response = await fetch(`api/lobby/leave?id=${id}`, {
+            method: 'GET',
+        })
+
+        window.location.href = '/'
     }
 
     onLoad()
@@ -91,8 +145,7 @@
     </div>
     <div class="container-vertical">
         <div class="container-horizontal">
-            <button class="default-button width-50" onclick={atualizar}> Atualizar </button>
-            <button class="default-button width-50" onclick={getLocation}> Comecou? </button>
+            <div class="default-button width-50"> Lobby </div>
         </div>
         <ol class="ol-players">
             {#if players.players.length > 0}
@@ -102,9 +155,18 @@
             {/if}
         </ol>
         <div class="container-horizontal">
-            <input type="text" class="default-input thin" onchange={updateLocation} value="praia"/>
-            <button class="default-button thin" onclick={startGame}>Start</button>
-            <!-- <button onclick={debugCheats}>Cheat!</button> -->
+            {#if !game_started}
+                <input type="text" class="default-input thin" onchange={updateLocation} value="praia"/>
+                <button class="default-button thin" onclick={startGame}>Start</button>
+            {:else if game_started}
+                <h2>{ current_location }</h2>
+            {/if}
+        </div>
+        <div class="container-horizontal">
+            <button class="default-button thin" onclick={leave}> Leave </button>
+            {#if game_started}
+                <button class="default-button thin" onclick={endGame}> End </button>
+            {/if}
         </div>
     </div>
 </div>

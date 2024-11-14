@@ -12,7 +12,18 @@ class WebSocketModel {
         }
 
         this.socket_connections.set(id, socket)
+        socket.onclose = () => {
+            this.socket_connections.delete(id)
+        }
         return response
+    }
+
+    closeSocket(id: PlayerId): void {
+        const socket = this.socket_connections.get(id)
+        if (socket) {
+            socket.close()
+            this.socket_connections.delete(id)
+        }
     }
 
     broadcast(message: BroadcastMessage): void {
