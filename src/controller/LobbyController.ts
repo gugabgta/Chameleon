@@ -17,6 +17,10 @@ class LobbyController {
         return new Response(this.lobby.index())
     }
 
+    create(): Response {
+        return new Response("Not implemented", { status: 501 })
+    }
+
     getPlayers(): Response {
         const players: Array<Player> = this.lobby.getPlayers()
 

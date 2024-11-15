@@ -2,6 +2,7 @@ import { assertEquals } from "jsr:@std/assert"
 import Router from "../src/routing/Router.ts"
 import HTTPMethod from "../src/types/HttpMethod.ts"
 import MockModel from "./model/MockModel.ts"
+import MockMiddleware from "./model/MockMiddleware.ts"
 
 if (import.meta.main) {
     Deno.exit(1)
@@ -22,6 +23,7 @@ router.registerRoute(HTTPMethod.GET, "/", () => {
 })
 
 router.registerRoute(HTTPMethod.GET, "/mockModel", MockModel.a_method)
+router.registerRoute(HTTPMethod.GET, "/mockModelMiddleware", MockModel.a_method, new MockMiddleware())
 router.registerRoute(HTTPMethod.POST, "/mockModel", MockModel.another_method)
 router.routeGroup("/test", HTTPMethod.GET, [
     ["/get", () => new Response("working")],
@@ -50,6 +52,16 @@ Deno.test("router get", async () => {
     })
     const text = await response.text()
     assertEquals(text, "a_method")
+})
+
+Deno.test("Middleware fail", async () => {
+    const response = await fetch("http://localhost:3003/mockModelMiddleware", {
+        method: "GET",
+    })
+    if (!response.ok) {
+        response.body?.cancel()
+    }
+    assertEquals(response.status, 401)
 })
 
 Deno.test("router post", async () => {
