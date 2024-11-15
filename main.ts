@@ -1,12 +1,15 @@
-import Router from "./src/controller/Router.ts"
+import Router from "./src/routing/Router.ts"
 import HTTPMethod from "./src/types/HttpMethod.ts"
 import Lobby, { type LobbySettings } from "./src/model/Lobby.ts"
 import Html from "./src/Html.ts"
 import "jsr:@std/dotenv/load"
 import LobbyController from "./src/controller/LobbyController.ts"
-import Uuid from "./src/Helpers/Uuid.ts"
+import Uuid from "./src/helpers/Uuid.ts"
 import WebSocketController from "./src/controller/WebSocketController.ts"
 import WebSocketModel from "./src/model/WebSocket.ts"
+import Auth from "./src/routing/Auth.ts"
+
+const authMiddleware = new Auth()
 
 if (!import.meta.main) {
     Deno.exit(1)
@@ -52,9 +55,8 @@ router.routeGroup("/api/lobby", HTTPMethod.GET, [
     ["/webSocket", webSocketController.assignWebSocket.bind(webSocketController)],
     ["/getPlayers", lobbyController.getPlayers.bind(lobbyController)],
     ["/getLocation", lobbyController.getLocation.bind(lobbyController)],
-    ["/kill", lobbyController.kill.bind(lobbyController)],
     ["/leave", lobbyController.leave.bind(lobbyController)],
-])
+], authMiddleware)
 
 router.routeGroup("/api/lobby", HTTPMethod.POST, [
     ["/join", lobbyController.join.bind(lobbyController)],

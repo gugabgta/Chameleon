@@ -1,13 +1,16 @@
-import Helpers from "../Helpers/Helpers.ts"
+import Helpers from "../helpers/Helpers.ts"
+import Uuid from "../helpers/Uuid.ts"
 import Player, { type PlayerId } from "./Player.ts"
 
 class Lobby {
     players: Map<PlayerId, Player> = new Map()
     settings: LobbySettings
     host: Player | null = null
+    id: LobbyId
 
     constructor(settings: LobbySettings) {
         this.settings = settings
+        this.id = Uuid.generate()
     }
 
     index(): string {
@@ -93,5 +96,7 @@ export type LobbySettings = {
     impostors: number
     id: string
 }
+
+type LobbyId = string
 
 export default Lobby

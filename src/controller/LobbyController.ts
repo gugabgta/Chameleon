@@ -1,4 +1,4 @@
-import Helpers from "../Helpers/Helpers.ts"
+import Helpers from "../helpers/Helpers.ts"
 import BroadcastMessage from "../model/BroadcastMessage.ts"
 import Lobby from "../model/Lobby.ts"
 import Player from "../model/Player.ts"

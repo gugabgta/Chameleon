@@ -1,7 +1,7 @@
 import { assertEquals } from "jsr:@std/assert"
 import Lobby from "../src/model/Lobby.ts"
 import Player from "../src/model/Player.ts"
-import Uuid from "../src/Helpers/Uuid.ts"
+import Uuid from "../src/helpers/Uuid.ts"
 
 if (import.meta.main) {
     Deno.exit(1)

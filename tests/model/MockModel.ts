@@ -1,4 +1,4 @@
-import Helpers from "../../src/Helpers/Helpers.ts"
+import Helpers from "../../src/helpers/Helpers.ts"
 
 class MockModel {
     name: string

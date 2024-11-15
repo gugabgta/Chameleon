@@ -1,7 +1,7 @@
 import { assertEquals } from "jsr:@std/assert"
-import Router from "../src/controller/Router.ts"
-import MockModel from "./model/MockModel.ts"
+import Router from "../src/routing/Router.ts"
 import HTTPMethod from "../src/types/HttpMethod.ts"
+import MockModel from "./model/MockModel.ts"
 
 if (import.meta.main) {
     Deno.exit(1)

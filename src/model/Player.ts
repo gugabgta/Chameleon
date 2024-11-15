@@ -1,4 +1,4 @@
-import Uuid from "../Helpers/Uuid.ts"
+import Uuid from "../helpers/Uuid.ts"
 
 export type PlayerId = string
 

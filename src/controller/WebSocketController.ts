@@ -1,4 +1,4 @@
-import Helpers from "../Helpers/Helpers.ts"
+import Helpers from "../helpers/Helpers.ts"
 import BroadcastMessage from "../model/BroadcastMessage.ts"
 import type Lobby from "../model/Lobby.ts"
 import WebSocketModel from "../model/WebSocket.ts"
