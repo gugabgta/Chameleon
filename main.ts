@@ -9,8 +9,6 @@ import WebSocketController from "./src/controller/WebSocketController.ts"
 import WebSocketModel from "./src/model/WebSocket.ts"
 import Auth from "./src/routing/Auth.ts"
 
-const authMiddleware = new Auth()
-
 if (!import.meta.main) {
     Deno.exit(1)
 }

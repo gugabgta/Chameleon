@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "deno run -A --watch main.ts",
+    "run": "deno run -A --unstable-kv --watch main.ts ",
     "test": "deno test --allow-env --allow-read --allow-net",
     "build": "deno compile --env-file=.env --allow-read --allow-net main.ts",
     "fmt": "deno fmt --check && deno lint",

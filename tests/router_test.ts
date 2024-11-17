@@ -23,7 +23,12 @@ router.registerRoute(HTTPMethod.GET, "/", () => {
 })
 
 router.registerRoute(HTTPMethod.GET, "/mockModel", MockModel.a_method)
-router.registerRoute(HTTPMethod.GET, "/mockModelMiddleware", MockModel.a_method, new MockMiddleware())
+router.registerRoute(
+    HTTPMethod.GET,
+    "/mockModelMiddleware",
+    MockModel.a_method,
+    new MockMiddleware(),
+)
 router.registerRoute(HTTPMethod.POST, "/mockModel", MockModel.another_method)
 router.routeGroup("/test", HTTPMethod.GET, [
     ["/get", () => new Response("working")],
