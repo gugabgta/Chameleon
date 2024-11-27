@@ -5,15 +5,11 @@ import sveltePreprocess from 'svelte-preprocess'
 export default defineConfig({
   plugins: [
     svelte({
-      preprocess: sveltePreprocess({}),
-      exclude: /\.svelte$/,
-      emitCss: false,
-    }),
-    svelte({
       preprocess: sveltePreprocess(),
       include: /\.svelte$/,
       compilerOptions: {
         customElement: true,
+        css: 'injected',
       },
       emitCss: false,
     }),
@@ -23,8 +19,8 @@ export default defineConfig({
     target: 'modules',
     lib: {
       entry: 'src/main.js',
-      name: '<<name>>',
-      fileName: 'components',
+      name: 'everything',
+      fileName: "components",
     },
   },
 })

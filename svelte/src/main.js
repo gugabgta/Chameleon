@@ -1,2 +1,3 @@
-import menuComponent from './components/menuComponent.svelte';
-import lobbyComponent from './components/lobbyComponent.svelte';
+import menuComponent from './pages/menuComponent.svelte';
+import lobbyComponent from './pages/lobbyComponent.svelte';
+import modal from './components/modal.svelte';

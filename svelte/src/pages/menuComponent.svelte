@@ -1,16 +1,22 @@
-<svelte:options customElement="menu-component" />
+<svelte:options customElement="menu-page" />
+<link rel="stylesheet" href="../styles.css">
 
 <!-- workaround to avoid class not existing -->
 {#if false}
     <div class="shake" ></div>
 {/if}
 
-<script lang="ts">
-    let name = $state("Gustavo")
-    let input: HTMLInputElement | null = null
+<script>
+// @ts-nocheck
 
-    function changeName(event: Event) {
-        const target = event.target as HTMLInputElement;
+    import Modal from '../components/modal.svelte'
+
+    let show_modal = $state(false)
+    let name = $state("")
+    let input = null
+
+    function changeName(event) {
+        const target = event.target;
         if (target) {
             name = target.value;
         }
@@ -18,6 +24,7 @@
 
     async function click() {
         if (name.length < 2 && input) {
+            show_modal = true
             input.classList.toggle('shake')
             setTimeout(() => input?.classList.toggle('shake'), 390)
             return
@@ -57,6 +64,17 @@
     </div>
 </div>
 
+<Modal bind:show_modal>
+    <!-- {#snippet header()}
+        Ops! Something went wrong
+    {/snippet} -->
+
+    {#snippet children()}
+        <p> Your name must have at least 2 characters </p>
+    {/snippet}
+</Modal>
+
+
 <style>
     .component-wrapper {
         display: flex;
@@ -76,20 +94,6 @@
         width: 100%;
         padding: 14px;
         box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    .app-bar h2 {
-        font-family: 'Roboto', sans-serif;
-        font-size: 36px;
-        color: white;
-    }
-
-    .container-vertical {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
     }
 
     .default-input {
@@ -121,6 +125,22 @@
         box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
         overflow: hidden;
     }
+
+    .app-bar h2 {
+        font-family: 'Roboto', sans-serif;
+        font-size: 36px;
+        color: white;
+    }
+
+    .container-vertical {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+    }
+
+
 
     .shake {
         animation: shake 0.13s;

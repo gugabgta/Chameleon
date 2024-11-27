@@ -35,11 +35,11 @@ const lobbyController = new LobbyController(lobby, ws)
 const webSocketController = new WebSocketController(lobby, ws)
 
 router.registerRoute(HTTPMethod.GET, "/", () => {
-    return new Html("menu-component").htmlResponse()
+    return new Html("menu-page").htmlResponse()
 })
 
 router.registerRoute(HTTPMethod.GET, "/lobby", () => {
-    return new Html("lobby-component").htmlResponse()
+    return new Html("lobby-page").htmlResponse()
 })
 
 router.registerRoute(HTTPMethod.GET, "/appjs", () => {

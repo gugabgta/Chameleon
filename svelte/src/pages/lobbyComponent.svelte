@@ -1,13 +1,16 @@
-<svelte:options customElement="lobby-component" />
+<svelte:options customElement="lobby-page" />
+<link rel="stylesheet" href="../styles.css">
 
 <script>
 // @ts-nocheck
+
+    import Modal from '../components/modal.svelte'
 
     export const name = new URL(window.location.href).searchParams.get('name') ?? ""
     export const id = new URL(window.location.href).searchParams.get('id') ?? "0"
 
     let players = $state({ players: [] })
-    let location = $state("praia")
+    let location = $state("")
     let current_location = $state("")
     let game_started = $state(false)
     let web_socket = null
@@ -194,6 +197,36 @@
         margin-bottom: 5vh;
     }
 
+    .default-input {
+        width: 50%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ffa500;
+        border-radius: 8px;
+        color: #ffa500;
+        font-size: large;
+        text-align: center;
+        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .default-button {
+        width: 50%;
+        background-color: #ffa500;
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 10px 24px;
+        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+    }
+
     .app-bar h2 {
         font-family: 'Roboto', sans-serif;
         font-size: 36px;
@@ -218,35 +251,6 @@
 
     .width-50 {
         width: 50%;
-    }
-
-    .default-button {
-        background-color: #ffa500;
-        border: none;
-        color: white;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 8px;
-        padding: 10px 24px;
-        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-    }
-
-    .default-input {
-        padding: 12px 20px;
-        margin: 8px 0;
-        box-sizing: border-box;
-        border: 2px solid #ffa500;
-        border-radius: 8px;
-        color: #ffa500;
-        font-size: large;
-        text-align: center;
-        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.2);
-        max-width: 60%;
     }
 
     .ol-players {
